@@ -15,6 +15,20 @@ def convertPdf2Docx(src_path: str, dist_path: str):
     pdf2docx.parse(pdf_file=src_path, docx_file=dist_path)
 
 
+def checkAllPdfConversion():
+    pdf_path = os.path.normpath("./pdf")
+    files = [f for f in os.listdir(
+        pdf_path) if os.path.isfile(os.path.join(pdf_path, f))]
+    for filepath in files:
+        [filename, ext] = os.path.splitext(filepath)
+        src_path = os.path.join("./pdf", f"{filename}.pdf")
+        dist_path = os.path.join("./docx", f"{filename}.docx")
+        if not ext == ".pdf":
+            continue
+        if not os.path.exists(dist_path):
+            convertPdf2Docx(src_path=src_path, dist_path=dist_path)
+
+
 class CustomFileHandler(watchdog.events.FileSystemEventHandler):
     def dispatch(self, event) -> None:
         if event.event_type == "created" or event.event_type == "modified":
@@ -42,6 +56,7 @@ Menutup program: Tekan \"Ctrl\"+\"c\" untuk menyelesaikan program
 
 Siap memulai konversi!""")
     try:
+        checkAllPdfConversion()
         while observer.is_alive():
             observer.join(1)
     finally:
