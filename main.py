@@ -32,6 +32,15 @@ def main():
 
     observer.schedule(event_handler=handler, path=os.path.normpath("./pdf"))
     observer.start()
+    print("Dinasty Odoo pdf2docx")
+    print("""Dinasty Odoo pdf2docx converter
+----------------------------
+Cara pakai: Letakan faktur pdf yang ingin dikonversi di folder \"pdf\", program akan mekonversi
+secara otomatis dan meletakan hasilnya di folder \"docx\" dengan nama file yang sama
+
+Menutup program: Tekan \"Ctrl\"+\"c\" untuk menyelesaikan program
+
+Siap memulai konversi!""")
     try:
         while observer.is_alive():
             observer.join(1)
