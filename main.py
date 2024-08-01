@@ -1,4 +1,6 @@
+from genericpath import isfile
 import os
+import time
 import pdf2docx
 import watchdog.observers
 import watchdog.events
@@ -31,10 +33,26 @@ def checkAllPdfConversion():
 
 class CustomFileHandler(watchdog.events.FileSystemEventHandler):
     def dispatch(self, event) -> None:
-        if event.event_type == "created" or event.event_type == "modified":
-            filename = os.path.splitext(os.path.basename(event.src_path))[0]
-            dist_path = os.path.join('./docx/', f'{filename}.docx')
-            convertPdf2Docx(src_path=event.src_path, dist_path=dist_path)
+        if event.event_type != "created" and event.event_type != "modified":
+            return super().dispatch(event)
+        
+        [filename, extension] = os.path.splitext(os.path.basename(event.src_path))
+        dist_path =os.path.join('./docx/', f'{filename}.docx')
+        
+        if extension != ".pdf":
+            return super().dispatch(event)
+
+        # Wait os module can read new file
+        timeout_second = 5
+        start_time = time.time()
+        while time.time() - start_time < timeout_second:
+            if os.path.exists(event.src_path):
+                break
+
+        if not os.path.exists(event.src_path):
+            raise TimeoutError(f'{event.src_path} terlalu lama diproses')
+
+        convertPdf2Docx(src_path=event.src_path, dist_path=dist_path)
         return super().dispatch(event)
 
 
